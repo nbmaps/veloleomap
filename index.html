@@ -89,7 +89,7 @@
     fetch(discoveryUrl)
       .then(res => res.json())
       .then(data => {
-        const feeds = Object.fromEntries(data.data.feeds.map(f => [f.name, f.url]));
+        const feeds = Object.fromEntries(data.data.de.feeds.map(f => [f.name, f.url]));
         return Promise.all([
           fetch(feeds.station_information).then(res => res.json()),
           fetch(feeds.station_status).then(res => res.json())
