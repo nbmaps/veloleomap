@@ -4,7 +4,7 @@
 "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
 "features": [
 { "type": "Feature", "properties": { "place_name": "P&R Lincolnsiedlung", "status": "Errichtung folgt demnächst", "lat": "52,31159602", "lng": "10,51544974" }, "geometry": { "type": "Point", "coordinates": [ 10.51544974, 52.31159602 ] } },
-{ "type": "Feature", "properties": { "place_name": "P&R Thüringenplatz (Erfurtplatz ersatz)", "status": "Errichtung folgt demnächst", "lat": "52,23022265", "lng": "10,5339566" }, "geometry": { "type": "Point", "coordinates": [ 10.5339566, 52.23022265 ] } },
+{ "type": "Feature", "properties": { "place_name": "P&R Thüringenplatz", "status": "Errichtung folgt demnächst", "lat": "52,23022265", "lng": "10,5339566" }, "geometry": { "type": "Point", "coordinates": [ 10.5339566, 52.23022265 ] } },
 { "type": "Feature", "properties": { "place_name": "Richterstraße", "status": "potenzieller Standort", "lat": "52,274189", "lng": "10,544808" }, "geometry": { "type": "Point", "coordinates": [ 10.544808, 52.274189 ] } },
 { "type": "Feature", "properties": { "place_name": "Am Ölper Holze/Niedstraße Schaumburgstraße", "status": "potenzieller Standort", "lat": "52,28296577", "lng": "10,4813747" }, "geometry": { "type": "Point", "coordinates": [ 10.4813747, 52.28296577 ] } },
 { "type": "Feature", "properties": { "place_name": "Kolleg", "status": "potenzieller Standort", "lat": "52,241357", "lng": "10,527468" }, "geometry": { "type": "Point", "coordinates": [ 10.527468, 52.241357 ] } },
@@ -18,7 +18,7 @@
 { "type": "Feature", "properties": { "place_name": "Lindenbergplatz", "status": "potenzieller Standort", "lat": "52,24567434", "lng": "10,56283558" }, "geometry": { "type": "Point", "coordinates": [ 10.56283558, 52.24567434 ] } },
 { "type": "Feature", "properties": { "place_name": "Gemeindestraße (Rautheim)", "status": "potenzieller Standort", "lat": "52,23980741", "lng": "10,5819927" }, "geometry": { "type": "Point", "coordinates": [ 10.5819927, 52.23980741 ] } },
 { "type": "Feature", "properties": { "place_name": "Hermann-Blenk-Straße - IFL", "status": "potenzieller Standort", "lat": "52,31427915", "lng": "10,54755516" }, "geometry": { "type": "Point", "coordinates": [ 10.54755516, 52.31427915 ] } },
-{ "type": "Feature", "properties": { "place_name": "Galeria (warten)", "status": "potenzieller Standort", "lat": "52,26336191", "lng": "10,51955775" }, "geometry": { "type": "Point", "coordinates": [ 10.51955775, 52.26336191 ] } },
+{ "type": "Feature", "properties": { "place_name": "Galeria", "status": "potenzieller Standort", "lat": "52,26336191", "lng": "10,51955775" }, "geometry": { "type": "Point", "coordinates": [ 10.51955775, 52.26336191 ] } },
 { "type": "Feature", "properties": { "place_name": "P+R Rote Wiese", "status": "potenzieller Standort", "lat": "52,23991896", "lng": "10,53830485" }, "geometry": { "type": "Point", "coordinates": [ 10.53830485, 52.23991896 ] } },
 { "type": "Feature", "properties": { "place_name": "Tostmannplatz (Schuntersiedlung)", "status": "potenzieller Standort", "lat": "52,29624505", "lng": "10,53998684" }, "geometry": { "type": "Point", "coordinates": [ 10.53998684, 52.29624505 ] } },
 { "type": "Feature", "properties": { "place_name": "Fallersleber-Tor-Wall", "status": "potenzieller Standort", "lat": "52,26953954", "lng": "10,53013035" }, "geometry": { "type": "Point", "coordinates": [ 10.53013035, 52.26953954 ] } },
