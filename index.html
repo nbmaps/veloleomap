@@ -1,430 +1,165 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Veloleo – Braunschweig (statisch)</title>
-  <meta charset="utf-8" />
+  <title>Veloleo – Braunschweig (CORS-Bypass)</title>
+  <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="bike-icon.png"/>
 
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-
-  <!-- Geocoder CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
-
-  <!-- MarkerCluster CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css"/>
 
   <style>
-    body { margin: 0; }
-    #map { height: 100vh; width: 100vw; }
+    body { margin:0; }
+    #map { height:100vh; width:100vw; }
 
     #logo-link {
+      position:absolute; top:10px; left:60px; z-index:1000;
+      background:white; padding:5px; border-radius:8px;
+      box-shadow:0 0 5px rgba(0,0,0,0.2);
+    }
+
+    #velo-logo { height:50px; width:auto; }
+
+    #toggleCluster, #locateMe {
       position: absolute;
-      top: 10px;
-      left: 60px;
       z-index: 1000;
+      background: #fff;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      box-shadow: 0 0 4px rgba(0,0,0,0.3);
+      cursor: pointer;
+      font-family: sans-serif;
+    }
+
+    #toggleCluster { bottom: 60px; right: 10px; }
+    #locateMe { bottom: 20px; right: 10px; }
+
+    .leaflet-control-geocoder {
+      z-index: 1100 !important;
       background: white;
-      padding: 5px;
-      border-radius: 8px;
+      padding: 4px;
+      border-radius: 6px;
       box-shadow: 0 0 5px rgba(0,0,0,0.2);
     }
 
-    #velo-logo {
-      height: 50px;
-      width: auto;
+    @media (max-width:600px){
+      .leaflet-control-geocoder {
+        margin-top: 60px;
+        max-width: 90%;
+      }
     }
-
-    #logo-link:hover {
-      opacity: 0.5;
-    }
-
-    #toggleCluster {
-      position: absolute;
-      bottom: 60px;
-      right: 10px;
-      z-index: 1000;
-      background: #fff;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
-      box-shadow: 0 0 4px rgba(0,0,0,0.3);
-      cursor: pointer;
-      font-family: sans-serif;
-    }
-
-    #locateMe {
-      position: absolute;
-      bottom: 20px;
-      right: 10px;
-      z-index: 1000;
-      background: #fff;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
-      box-shadow: 0 0 4px rgba(0,0,0,0.3);
-      cursor: pointer;
-      font-family: sans-serif;
-    }
-    .leaflet-control-geocoder {
-  max-width: 250px;
-  width: auto;
-  z-index: 1001;
-  font-size: 14px;
-}
-
-@media (max-width: 600px) {
-  .leaflet-control-geocoder {
-    max-width: 90%;
-    margin-bottom: 60px; /* Platz über den Buttons */
-  }
-}
   </style>
 </head>
 <body>
+  <div id="map"></div>
+  <a id="logo-link" href="https://www.nextbike.de/veloleo/de/" target="_blank" rel="noopener">
+    <img id="velo-logo" src="logodomain.png" alt="Veloleo Logo"/>
+  </a>
+  <button id="toggleCluster">Cluster einblenden</button>
+  <button id="locateMe">📍 Mein Standort</button>
 
-<div id="map"></div>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
 
-<a id="logo-link" href="https://www.nextbike.de/veloleo/de/" target="_blank" rel="noopener">
-  <img id="velo-logo" src="https://www.nextbike.de/veloleo/wp-content/uploads/sites/39/2025/01/Logo-2.svg" alt="Veloleo Logo" />
-</a>
+  <script>
+    const map = L.map('map').setView([52.264, 10.526], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap-Mitwirkende'
+    }).addTo(map);
+    L.Control.geocoder({position: 'bottomleft'}).addTo(map);
 
-<button id="toggleCluster">Cluster einblenden</button>
-<button id="locateMe">📍 Mein Standort</button>
-
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet/dist/leaflet.js">
-    const comingIcon = L.icon({
-      iconUrl: 'bike-icon_perhaps.png',
+    const bikeIcon = L.icon({
+      iconUrl: 'bike-icon.png',
       iconSize: [40, 40],
       iconAnchor: [20, 40],
       popupAnchor: [0, -40]
     });
 
-    // Geplante Stationen: bscoming.geojson
-    fetch('./bscoming.geojson')
-      .then(res => res.json())
-      .then(data => {
-        const futureLayer = L.geoJSON(data, {
-          pointToLayer: (feature, latlng) => L.marker(latlng, { icon: comingIcon }),
-          onEachFeature: (feature, layer) => {
-            const p = feature.properties;
-            const popup = `<b>${p.place_name}</b><br>Status: ${p.status}`;
-            layer.bindPopup(popup);
-            layer.on('mouseover', () => layer.openPopup());
-            layer.on('mouseout', () => layer.closePopup());
+    const markers = L.markerClusterGroup();
+    const plainMarkers = L.layerGroup();
+    let clusteringEnabled = false;
+
+    const cors = "https://corsproxy.io/?";
+    const stationInfoUrl = cors + "https://gbfs.nextbike.net/maps/gbfs/v2/nextbike_dn/de/station_information.json";
+    const stationStatusUrl = cors + "https://gbfs.nextbike.net/maps/gbfs/v2/nextbike_dn/de/station_status.json";
+
+    Promise.all([
+      fetch(stationInfoUrl).then(res => res.json()),
+      fetch(stationStatusUrl).then(res => res.json())
+    ])
+    .then(([info, status]) => {
+      const infoMap = Object.fromEntries(info.data.stations.map(s => [s.station_id, s]));
+      const features = status.data.stations.map(s => {
+        const i = infoMap[s.station_id];
+        if (!i) return null;
+        return {
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: [i.lon, i.lat] },
+          properties: {
+            name: i.name,
+            station_id: i.short_name,
+            bikes: s.num_bikes_available,
+            docks: s.num_docks_available
           }
-        });
-        futureLayer.addTo(map);
-      })
-      .catch(err => {
-        console.error('Fehler beim Laden der bscoming.geojson', err);
+        };
+      }).filter(Boolean);
+
+      const layer = L.geoJSON(features, {
+        pointToLayer: (feature, latlng) => L.marker(latlng, { icon: bikeIcon }),
+        onEachFeature: (feature, layer) => {
+          const p = feature.properties;
+          const popup = <b>${p.name}</b><br>Stationsnummer: ${p.station_id}<br>Räder: ${p.bikes};
+          layer.bindPopup(popup);
+          layer.on('mouseover', () => layer.openPopup());
+          layer.on('mouseout', () => layer.closePopup());
+        }
       });
 
-
-    const comingIcon = L.icon({
-      iconUrl: 'bike-icon_perhaps.png',
-      iconSize: [40, 40],
-      iconAnchor: [20, 40],
-      popupAnchor: [0, -40]
-    });
-
-    // Geplante Stationen (bscoming.geojson)
-    fetch('bscoming.geojson')
-      .then(res => res.json())
-      .then(data => {
-        const comingLayer = L.geoJSON(data, {
-          pointToLayer: (feature, latlng) => L.marker(latlng, { icon: comingIcon }),
-          onEachFeature: (feature, layer) => {
-            const p = feature.properties;
-            const popup = `<b>${p.place_name}</b><br>Status: ${p.status}`;
-            layer.bindPopup(popup);
-            layer.on('mouseover', () => layer.openPopup());
-            layer.on('mouseout', () => layer.closePopup());
-          }
-        });
-        comingLayer.addTo(map);
-      })
-      .catch(err => {
-        console.error('Fehler beim Laden der geplanten Stationen (bscoming.geojson)', err);
-      });
-
-</script>
-
-<!-- Geocoder JS -->
-<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js">
-    const comingIcon = L.icon({
-      iconUrl: 'bike-icon_perhaps.png',
-      iconSize: [40, 40],
-      iconAnchor: [20, 40],
-      popupAnchor: [0, -40]
-    });
-
-    // Geplante Stationen: bscoming.geojson
-    fetch('./bscoming.geojson')
-      .then(res => res.json())
-      .then(data => {
-        const futureLayer = L.geoJSON(data, {
-          pointToLayer: (feature, latlng) => L.marker(latlng, { icon: comingIcon }),
-          onEachFeature: (feature, layer) => {
-            const p = feature.properties;
-            const popup = `<b>${p.place_name}</b><br>Status: ${p.status}`;
-            layer.bindPopup(popup);
-            layer.on('mouseover', () => layer.openPopup());
-            layer.on('mouseout', () => layer.closePopup());
-          }
-        });
-        futureLayer.addTo(map);
-      })
-      .catch(err => {
-        console.error('Fehler beim Laden der bscoming.geojson', err);
-      });
-
-
-    const comingIcon = L.icon({
-      iconUrl: 'bike-icon_perhaps.png',
-      iconSize: [40, 40],
-      iconAnchor: [20, 40],
-      popupAnchor: [0, -40]
-    });
-
-    // Geplante Stationen (bscoming.geojson)
-    fetch('bscoming.geojson')
-      .then(res => res.json())
-      .then(data => {
-        const comingLayer = L.geoJSON(data, {
-          pointToLayer: (feature, latlng) => L.marker(latlng, { icon: comingIcon }),
-          onEachFeature: (feature, layer) => {
-            const p = feature.properties;
-            const popup = `<b>${p.place_name}</b><br>Status: ${p.status}`;
-            layer.bindPopup(popup);
-            layer.on('mouseover', () => layer.openPopup());
-            layer.on('mouseout', () => layer.closePopup());
-          }
-        });
-        comingLayer.addTo(map);
-      })
-      .catch(err => {
-        console.error('Fehler beim Laden der geplanten Stationen (bscoming.geojson)', err);
-      });
-
-</script>
-
-<!-- MarkerCluster JS -->
-<script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js">
-    const comingIcon = L.icon({
-      iconUrl: 'bike-icon_perhaps.png',
-      iconSize: [40, 40],
-      iconAnchor: [20, 40],
-      popupAnchor: [0, -40]
-    });
-
-    // Geplante Stationen: bscoming.geojson
-    fetch('./bscoming.geojson')
-      .then(res => res.json())
-      .then(data => {
-        const futureLayer = L.geoJSON(data, {
-          pointToLayer: (feature, latlng) => L.marker(latlng, { icon: comingIcon }),
-          onEachFeature: (feature, layer) => {
-            const p = feature.properties;
-            const popup = `<b>${p.place_name}</b><br>Status: ${p.status}`;
-            layer.bindPopup(popup);
-            layer.on('mouseover', () => layer.openPopup());
-            layer.on('mouseout', () => layer.closePopup());
-          }
-        });
-        futureLayer.addTo(map);
-      })
-      .catch(err => {
-        console.error('Fehler beim Laden der bscoming.geojson', err);
-      });
-
-
-    const comingIcon = L.icon({
-      iconUrl: 'bike-icon_perhaps.png',
-      iconSize: [40, 40],
-      iconAnchor: [20, 40],
-      popupAnchor: [0, -40]
-    });
-
-    // Geplante Stationen (bscoming.geojson)
-    fetch('bscoming.geojson')
-      .then(res => res.json())
-      .then(data => {
-        const comingLayer = L.geoJSON(data, {
-          pointToLayer: (feature, latlng) => L.marker(latlng, { icon: comingIcon }),
-          onEachFeature: (feature, layer) => {
-            const p = feature.properties;
-            const popup = `<b>${p.place_name}</b><br>Status: ${p.status}`;
-            layer.bindPopup(popup);
-            layer.on('mouseover', () => layer.openPopup());
-            layer.on('mouseout', () => layer.closePopup());
-          }
-        });
-        comingLayer.addTo(map);
-      })
-      .catch(err => {
-        console.error('Fehler beim Laden der geplanten Stationen (bscoming.geojson)', err);
-      });
-
-</script>
-
-<script>
-  const map = L.map('map').setView([52.264, 10.526], 13); // Braunschweig
-
-  // Basiskarte
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap-Mitwirkende'
-  }).addTo(map);
-
-  // Geocoder
-  L.Control.geocoder({
-  position: 'bottomleft'
-}).addTo(map);
-
-  
-  const bikeIcon = L.icon({
-    iconUrl: 'bike-icon.png',
-    iconSize: [40, 40],
-    iconAnchor: [20, 40],
-    popupAnchor: [0, -40]
-  });
-
-  // Layer-Gruppen
-  const markers = L.markerClusterGroup();
-  const plainMarkers = L.layerGroup();
-  let clusteringEnabled = false;
-
-  // Daten laden
-  fetch('./stations.geojson')
-    .then(response => response.json())
-    .then(data => {
-  const geoJsonLayer = L.geoJSON(data, {
-    pointToLayer: function (feature, latlng) {
-      return L.marker(latlng, { icon: bikeIcon });
-    },
-    onEachFeature: function (feature, layer) {
-      const props = feature.properties;
-      const name = props["place_name"] || 'Unbekannt';
-      const number = props["station_number"] || '–';
-
-      const popupContent = `<b>${name}</b><br>Stationsnummer: ${number}`;
-      layer.bindPopup(popupContent);
-
-      // Popup bei Mouseover anzeigen
-      layer.on('mouseover', function () {
-        this.openPopup();
-      });
-      layer.on('mouseout', function () {
-        this.closePopup();
-      });
-    } // ← fehlte!
-  });
-
-  // Beide Layer vorbereiten
-  markers.addLayer(geoJsonLayer);
-  plainMarkers.addLayer(geoJsonLayer);
-
-  // Standardmäßig: KEIN Clustering
-  map.addLayer(plainMarkers);
-});
-
-  // Cluster-Button
-  document.getElementById("toggleCluster").addEventListener("click", () => {
-    if (clusteringEnabled) {
-      map.removeLayer(markers);
+      markers.addLayer(layer);
+      plainMarkers.addLayer(layer);
       map.addLayer(plainMarkers);
-      document.getElementById("toggleCluster").innerText = "Cluster einblenden";
-    } else {
-      map.removeLayer(plainMarkers);
-      map.addLayer(markers);
-      document.getElementById("toggleCluster").innerText = "Cluster ausblenden";
-    }
-    clusteringEnabled = !clusteringEnabled;
-  });
+    })
+    .catch(err => {
+      console.error('Fehler beim Laden der Stationsdaten', err);
+      alert('Stationsdaten konnten nicht geladen werden.');
+    });
 
-  // Standort-Button
-  document.getElementById("locateMe").addEventListener("click", () => {
-    if (!navigator.geolocation) {
-      alert("Geolokalisierung wird von deinem Browser nicht unterstützt.");
-      return;
-    }
+    document.getElementById('toggleCluster').onclick = function () {
+      if (clusteringEnabled) {
+        map.removeLayer(markers);
+        map.addLayer(plainMarkers);
+        this.innerText = 'Cluster einblenden';
+      } else {
+        map.removeLayer(plainMarkers);
+        map.addLayer(markers);
+        this.innerText = 'Cluster ausblenden';
+      }
+      clusteringEnabled = !clusteringEnabled;
+    };
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-
+    document.getElementById('locateMe').onclick = function () {
+      if (!navigator.geolocation) {
+        alert("Geolocation nicht unterstützt.");
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(pos => {
+        const lat = pos.coords.latitude, lng = pos.coords.longitude;
         map.setView([lat, lng], 15);
-
         L.circleMarker([lat, lng], {
           radius: 8,
           color: '#007aff',
           fillColor: '#007aff',
           fillOpacity: 0.8
         }).addTo(map).bindPopup("Du bist hier").openPopup();
-      },
-      () => {
+      }, () => {
         alert("Standort konnte nicht ermittelt werden.");
-      }
-    );
-  });
-
-    const comingIcon = L.icon({
-      iconUrl: 'bike-icon_perhaps.png',
-      iconSize: [40, 40],
-      iconAnchor: [20, 40],
-      popupAnchor: [0, -40]
-    });
-
-    // Geplante Stationen: bscoming.geojson
-    fetch('./bscoming.geojson')
-      .then(res => res.json())
-      .then(data => {
-        const futureLayer = L.geoJSON(data, {
-          pointToLayer: (feature, latlng) => L.marker(latlng, { icon: comingIcon }),
-          onEachFeature: (feature, layer) => {
-            const p = feature.properties;
-            const popup = `<b>${p.place_name}</b><br>Status: ${p.status}`;
-            layer.bindPopup(popup);
-            layer.on('mouseover', () => layer.openPopup());
-            layer.on('mouseout', () => layer.closePopup());
-          }
-        });
-        futureLayer.addTo(map);
-      })
-      .catch(err => {
-        console.error('Fehler beim Laden der bscoming.geojson', err);
       });
-
-
-    const comingIcon = L.icon({
-      iconUrl: 'bike-icon_perhaps.png',
-      iconSize: [40, 40],
-      iconAnchor: [20, 40],
-      popupAnchor: [0, -40]
-    });
-
-    // Geplante Stationen (bscoming.geojson)
-    fetch('bscoming.geojson')
-      .then(res => res.json())
-      .then(data => {
-        const comingLayer = L.geoJSON(data, {
-          pointToLayer: (feature, latlng) => L.marker(latlng, { icon: comingIcon }),
-          onEachFeature: (feature, layer) => {
-            const p = feature.properties;
-            const popup = `<b>${p.place_name}</b><br>Status: ${p.status}`;
-            layer.bindPopup(popup);
-            layer.on('mouseover', () => layer.openPopup());
-            layer.on('mouseout', () => layer.closePopup());
-          }
-        });
-        comingLayer.addTo(map);
-      })
-      .catch(err => {
-        console.error('Fehler beim Laden der geplanten Stationen (bscoming.geojson)', err);
-      });
-
-</script>
+    };
+  </script>
 </body>
 </html>
