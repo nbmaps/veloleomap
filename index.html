@@ -100,7 +100,7 @@
 <button id="toggleCluster">Cluster einblenden</button>
 <button id="locateMe">📍 Mein Standort</button>
 
-<!-- Scripts -->
+<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
@@ -124,6 +124,7 @@
   const markers = L.markerClusterGroup();
   const plainMarkers = L.layerGroup();
   let clusteringEnabled = false;
+
   const GBFS_BASE = "https://api.nextbike.net/maps/gbfs/v1/nextbike_bs";
   const stationInfoURL = `${GBFS_BASE}/station_information.json`;
   const stationStatusURL = `${GBFS_BASE}/station_status.json`;
@@ -139,6 +140,7 @@
 
     const geoJsonFeatures = statusData.data.stations.map(status => {
       const info = infoMap[status.station_id];
+      if (!info) return null;
       return {
         type: "Feature",
         geometry: {
@@ -149,10 +151,10 @@
           id: info.station_id,
           name: info.name,
           bikesAvailable: status.num_bikes_available,
-          capacity: info.capacity
+          capacity: info.capacity ?? '?'
         }
       };
-    });
+    }).filter(Boolean);
 
     const geoJsonLayer = L.geoJSON(geoJsonFeatures, {
       pointToLayer: function (feature, latlng) {
