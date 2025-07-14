@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Veloleo – Braunschweig</title>
+  <title>Veloleo – Braunschweig (statisch)</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
@@ -22,21 +22,21 @@
   }).addTo(map);
 
   fetch('./stations.geojson')
-  .then(response => response.json())
-  .then(data => {
-    L.geoJSON(data, {
-      onEachFeature: function (feature, layer) {
-        const props = feature.properties;
-        const name = props?.name || 'Unbekannt';
-        const uid = props?.uid || '–';
-        const bikes = props?.bikes ?? '?';
-        layer.bindPopup(`<b>${name}</b><br>Station: ${uid}<br>Räder verfügbar: ${bikes}`);
-      }
-    }).addTo(map);
-  })
-  .catch(error => {
-    console.error('Fehler beim Laden von stations.geojson:', error);
-  });
+    .then(response => response.json())
+    .then(data => {
+      L.geoJSON(data, {
+        onEachFeature: function (feature, layer) {
+          const props = feature.properties;
+          const name = props?.name || 'Unbekannt';
+          const uid = props?.uid || '–';
+
+          layer.bindPopup(`<b>${name}</b><br>Stationsnummer: ${uid}`);
+        }
+      }).addTo(map);
+    })
+    .catch(error => {
+      console.error('Fehler beim Laden von stations.geojson:', error);
+    });
 </script>
 </body>
 </html>
