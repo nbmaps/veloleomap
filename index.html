@@ -84,8 +84,64 @@
         console.error('Fehler beim Laden der bscoming.geojson', err);
       });
 
+
+    const comingIcon = L.icon({
+      iconUrl: 'bike-icon_perhaps.png',
+      iconSize: [40, 40],
+      iconAnchor: [20, 40],
+      popupAnchor: [0, -40]
+    });
+
+    // Zusätzlicher Layer: geplante Stationen aus bscoming.geojson
+    fetch('./bscoming.geojson')
+      .then(res => res.json())
+      .then(data => {
+        const bscomingLayer = L.geoJSON(data, {
+          pointToLayer: (feature, latlng) => L.marker(latlng, { icon: comingIcon }),
+          onEachFeature: (feature, layer) => {
+            const p = feature.properties;
+            const popup = `<b>${p.place_name}</b><br>Status: ${p.status}`;
+            layer.bindPopup(popup);
+            layer.on('mouseover', () => layer.openPopup());
+            layer.on('mouseout', () => layer.closePopup());
+          }
+        });
+        bscomingLayer.addTo(map);
+      })
+      .catch(err => {
+        console.error('Fehler beim Laden der bscoming.geojson', err);
+      });
+
 </script>
   <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js">
+    // Zusätzlicher Layer: geplante Stationen aus bscoming.geojson
+    fetch('./bscoming.geojson')
+      .then(res => res.json())
+      .then(data => {
+        const bscomingLayer = L.geoJSON(data, {
+          pointToLayer: (feature, latlng) => L.marker(latlng, { icon: comingIcon }),
+          onEachFeature: (feature, layer) => {
+            const p = feature.properties;
+            const popup = `<b>${p.place_name}</b><br>Status: ${p.status}`;
+            layer.bindPopup(popup);
+            layer.on('mouseover', () => layer.openPopup());
+            layer.on('mouseout', () => layer.closePopup());
+          }
+        });
+        bscomingLayer.addTo(map);
+      })
+      .catch(err => {
+        console.error('Fehler beim Laden der bscoming.geojson', err);
+      });
+
+
+    const comingIcon = L.icon({
+      iconUrl: 'bike-icon_perhaps.png',
+      iconSize: [40, 40],
+      iconAnchor: [20, 40],
+      popupAnchor: [0, -40]
+    });
+
     // Zusätzlicher Layer: geplante Stationen aus bscoming.geojson
     fetch('./bscoming.geojson')
       .then(res => res.json())
@@ -128,6 +184,34 @@
         console.error('Fehler beim Laden der bscoming.geojson', err);
       });
 
+
+    const comingIcon = L.icon({
+      iconUrl: 'bike-icon_perhaps.png',
+      iconSize: [40, 40],
+      iconAnchor: [20, 40],
+      popupAnchor: [0, -40]
+    });
+
+    // Zusätzlicher Layer: geplante Stationen aus bscoming.geojson
+    fetch('./bscoming.geojson')
+      .then(res => res.json())
+      .then(data => {
+        const bscomingLayer = L.geoJSON(data, {
+          pointToLayer: (feature, latlng) => L.marker(latlng, { icon: comingIcon }),
+          onEachFeature: (feature, layer) => {
+            const p = feature.properties;
+            const popup = `<b>${p.place_name}</b><br>Status: ${p.status}`;
+            layer.bindPopup(popup);
+            layer.on('mouseover', () => layer.openPopup());
+            layer.on('mouseout', () => layer.closePopup());
+          }
+        });
+        bscomingLayer.addTo(map);
+      })
+      .catch(err => {
+        console.error('Fehler beim Laden der bscoming.geojson', err);
+      });
+
 </script>
 
   <script>
@@ -138,13 +222,6 @@
     L.Control.geocoder({position: 'bottomleft'}).addTo(map);
 
             const bikeIcon = L.icon({
-    const comingIcon = L.icon({
-      iconUrl: 'bike-icon_perhaps.png',
-      iconSize: [40, 40],
-      iconAnchor: [20, 40],
-      popupAnchor: [0, -40]
-    });
-
       iconUrl: 'bike-icon_perhaps.png',
       iconSize: [40, 40],
       iconAnchor: [20, 40],
@@ -255,6 +332,34 @@
       });
     };
   
+    // Zusätzlicher Layer: geplante Stationen aus bscoming.geojson
+    fetch('./bscoming.geojson')
+      .then(res => res.json())
+      .then(data => {
+        const bscomingLayer = L.geoJSON(data, {
+          pointToLayer: (feature, latlng) => L.marker(latlng, { icon: comingIcon }),
+          onEachFeature: (feature, layer) => {
+            const p = feature.properties;
+            const popup = `<b>${p.place_name}</b><br>Status: ${p.status}`;
+            layer.bindPopup(popup);
+            layer.on('mouseover', () => layer.openPopup());
+            layer.on('mouseout', () => layer.closePopup());
+          }
+        });
+        bscomingLayer.addTo(map);
+      })
+      .catch(err => {
+        console.error('Fehler beim Laden der bscoming.geojson', err);
+      });
+
+
+    const comingIcon = L.icon({
+      iconUrl: 'bike-icon_perhaps.png',
+      iconSize: [40, 40],
+      iconAnchor: [20, 40],
+      popupAnchor: [0, -40]
+    });
+
     // Zusätzlicher Layer: geplante Stationen aus bscoming.geojson
     fetch('./bscoming.geojson')
       .then(res => res.json())
