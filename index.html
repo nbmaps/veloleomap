@@ -1,141 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Veloleo – Braunschweig (statisch)</title>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-
-  <!-- Geocoder CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
-
-  <!-- MarkerCluster CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
-  <link rel="icon" href="favicon.png" type="image/png">
-
-  <style>
-    body { margin: 0; }
-    #map { height: 100vh; width: 100vw; }
-
-    #logo-link {
-      position: absolute;
-      top: 10px;
-      left: 60px;
-      z-index: 1000;
-      background: white;
-      padding: 5px;
-      border-radius: 8px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.2);
-    }
-
-    #velo-logo {
-      height: 50px;
-      width: auto;
-    }
-
-    #logo-link:hover {
-      opacity: 0.5;
-    }
-
-    #toggleCluster {
-      position: absolute;
-      bottom: 60px;
-      right: 10px;
-      z-index: 1000;
-      background: #fff;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
-      box-shadow: 0 0 4px rgba(0,0,0,0.3);
-      cursor: pointer;
-      font-family: sans-serif;
-    }
-
-    #locateMe {
-      position: absolute;
-      bottom: 20px;
-      right: 10px;
-      z-index: 1000;
-      background: #fff;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
-      box-shadow: 0 0 4px rgba(0,0,0,0.3);
-      cursor: pointer;
-      font-family: sans-serif;
-    }
-
-    /* Geocoder-Button sichtbar & mobilfreundlich */
-    .leaflet-control-geocoder {
-      z-index: 1100 !important;
-      background: white;
-      padding: 4px;
-      border-radius: 6px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.2);
-    }
-
-    .leaflet-control-geocoder-icon {
-      width: 34px !important;
-      height: 34px !important;
-      background-size: 70% 70% !important;
-      background-position: center !important;
-      background-repeat: no-repeat !important;
-      background-color: white !important;
-      border-radius: 4px;
-      box-shadow: 0 0 3px rgba(0,0,0,0.3);
-      opacity: 1 !important;
-    }
-
-    @media (max-width: 600px) {
-      .leaflet-control-geocoder {
-        margin-top: 60px;
-        max-width: 90%;
-      }
-    }
-  </style>
-</head>
-<body>
-
-<div id="map"></div>
-
-<a id="logo-link" href="https://www.nextbike.de/veloleo/de/" target="_blank" rel="noopener">
-  <img id="velo-logo" src="https://www.nextbike.de/veloleo/wp-content/uploads/sites/39/2025/01/Logo-2.svg" alt="Veloleo Logo" />
-</a>
-
-<button id="toggleCluster">Cluster einblenden</button>
-<button id="locateMe">📍 Mein Standort</button>
-
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-<!-- Geocoder JS -->
-<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-
-<!-- MarkerCluster JS -->
-<script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
-
 <script>
-  const map = L.map('map').setView([52.264, 10.526], 13);
+  const map = L.map('map').setView([52.264, 10.526], 13); // Braunschweig
 
-  // Basiskarte
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap-Mitwirkende'
   }).addTo(map);
 
-  // Geocoder sichtbar platzieren
-  const geocoder = L.Control.geocoder({
-    position: 'topleft',
-    defaultMarkGeocode: false
-  })
-  .on('markgeocode', function(e) {
-    const bbox = e.geocode.bbox;
-    const bounds = L.latLngBounds(bbox);
-    map.fitBounds(bounds);
-  })
-  .addTo(map);
+  L.Control.geocoder({ position: 'bottomleft' }).addTo(map);
 
   const bikeIcon = L.icon({
     iconUrl: 'bike-icon.png',
@@ -148,31 +18,53 @@
   const plainMarkers = L.layerGroup();
   let clusteringEnabled = false;
 
-  // Daten laden
-  fetch('./stations.geojson')
-    .then(response => response.json())
-    .then(data => {
-      const geoJsonLayer = L.geoJSON(data, {
-        pointToLayer: function (feature, latlng) {
-          return L.marker(latlng, { icon: bikeIcon });
-        },
-        onEachFeature: function (feature, layer) {
-          const props = feature.properties;
-          const name = props["place_name"] || 'Unbekannt';
-          const number = props["station_number"] || '–';
-          const popupContent = `<b>${name}</b><br>Stationsnummer: ${number}`;
-          layer.bindPopup(popupContent);
-          layer.on('mouseover', function () { this.openPopup(); });
-          layer.on('mouseout', function () { this.closePopup(); });
-        }
-      });
+  // GBFS URLs für Veloleo Braunschweig
+  const stationInfoURL = "https://braunschweig.prod.nextbike.net/maps/gbfs/v2/bs/en/station_information.json";
+  const stationStatusURL = "https://braunschweig.prod.nextbike.net/maps/gbfs/v2/bs/en/station_status.json";
 
-      markers.addLayer(geoJsonLayer);
-      plainMarkers.addLayer(geoJsonLayer);
-      map.addLayer(plainMarkers);
+  Promise.all([
+    fetch(stationInfoURL).then(res => res.json()),
+    fetch(stationStatusURL).then(res => res.json())
+  ]).then(([infoData, statusData]) => {
+    const infoMap = {};
+    infoData.data.stations.forEach(station => {
+      infoMap[station.station_id] = station;
     });
 
-  // Cluster-Toggle
+    const geoJsonFeatures = statusData.data.stations.map(status => {
+      const info = infoMap[status.station_id];
+      return {
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [info.lon, info.lat]
+        },
+        properties: {
+          name: info.name,
+          bikesAvailable: status.num_bikes_available,
+          capacity: info.capacity
+        }
+      };
+    });
+
+    const geoJsonLayer = L.geoJSON(geoJsonFeatures, {
+      pointToLayer: function (feature, latlng) {
+        return L.marker(latlng, { icon: bikeIcon });
+      },
+      onEachFeature: function (feature, layer) {
+        const props = feature.properties;
+        const content = `<b>${props.name}</b><br>Fahrräder verfügbar: ${props.bikesAvailable} / ${props.capacity}`;
+        layer.bindPopup(content);
+        layer.on('mouseover', function () { this.openPopup(); });
+        layer.on('mouseout', function () { this.closePopup(); });
+      }
+    });
+
+    markers.addLayer(geoJsonLayer);
+    plainMarkers.addLayer(geoJsonLayer);
+    map.addLayer(plainMarkers);
+  });
+
   document.getElementById("toggleCluster").addEventListener("click", () => {
     if (clusteringEnabled) {
       map.removeLayer(markers);
@@ -186,17 +78,16 @@
     clusteringEnabled = !clusteringEnabled;
   });
 
-  // Standort-Button
   document.getElementById("locateMe").addEventListener("click", () => {
     if (!navigator.geolocation) {
-      alert("Geolokalisierung wird von deinem Browser nicht unterstützt.");
+      alert("Geolokalisierung wird nicht unterstützt.");
       return;
     }
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
         map.setView([lat, lng], 15);
         L.circleMarker([lat, lng], {
           radius: 8,
@@ -205,11 +96,7 @@
           fillOpacity: 0.8
         }).addTo(map).bindPopup("Du bist hier").openPopup();
       },
-      () => {
-        alert("Standort konnte nicht ermittelt werden.");
-      }
+      () => alert("Standort konnte nicht ermittelt werden.")
     );
   });
 </script>
-</body>
-</html>
