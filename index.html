@@ -4,7 +4,7 @@
   <title>Veloleo – Braunschweig (statisch)</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
@@ -38,6 +38,20 @@
     #logo-link:hover {
       opacity: 0.5;
     }
+
+    #toggleCluster {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      z-index: 1000;
+      background: #fff;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      box-shadow: 0 0 4px rgba(0,0,0,0.3);
+      cursor: pointer;
+      font-family: sans-serif;
+    }
   </style>
 </head>
 <body>
@@ -47,6 +61,8 @@
 <a id="logo-link" href="https://www.nextbike.de/veloleo/de/" target="_blank" rel="noopener">
   <img id="velo-logo" src="https://www.nextbike.de/veloleo/wp-content/uploads/sites/39/2025/01/Logo-2.svg" alt="Veloleo Logo" />
 </a>
+
+<button id="toggleCluster">Cluster ausblenden</button>
 
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -60,6 +76,7 @@
 <script>
   const map = L.map('map').setView([52.264, 10.526], 13); // Braunschweig
 
+  // Basiskarte
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap-Mitwirkende'
   }).addTo(map);
@@ -67,6 +84,7 @@
   // Geocoder hinzufügen
   L.Control.geocoder().addTo(map);
 
+  // Fahrrad-Icon
   const bikeIcon = L.icon({
     iconUrl: 'bike-icon.png',
     iconSize: [40, 40],
@@ -74,9 +92,12 @@
     popupAnchor: [0, -40]
   });
 
-  // Marker-Cluster-Gruppe vorbereiten
+  // Markergruppen
   const markers = L.markerClusterGroup();
+  const plainMarkers = L.layerGroup();
+  let clusteringEnabled = true;
 
+  // Daten laden
   fetch('./stations.geojson')
     .then(response => response.json())
     .then(data => {
@@ -92,9 +113,27 @@
         }
       });
 
+      // Beides vorbereiten
       markers.addLayer(geoJsonLayer);
+      plainMarkers.addLayer(geoJsonLayer);
+
+      // Standardmäßig Cluster anzeigen
       map.addLayer(markers);
     });
+
+  // Cluster-Button
+  document.getElementById("toggleCluster").addEventListener("click", () => {
+    if (clusteringEnabled) {
+      map.removeLayer(markers);
+      map.addLayer(plainMarkers);
+      document.getElementById("toggleCluster").innerText = "Cluster einblenden";
+    } else {
+      map.removeLayer(plainMarkers);
+      map.addLayer(markers);
+      document.getElementById("toggleCluster").innerText = "Cluster ausblenden";
+    }
+    clusteringEnabled = !clusteringEnabled;
+  });
 </script>
 </body>
 </html>
