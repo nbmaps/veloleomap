@@ -21,23 +21,15 @@
     attribution: '© OpenStreetMap-Mitwirkende'
   }).addTo(map);
 
-  fetch('https://api.nextbike.net/api/getStations.xml?city=braunschweig')
-    .then(response => response.text())
-    .then(xmlStr => {
-      const parser = new DOMParser();
-      const xml = parser.parseFromString(xmlStr, "application/xml");
-      const places = xml.getElementsByTagName("place");
-
-      for (let place of places) {
-        const lat = place.getAttribute("lat");
-        const lon = place.getAttribute("lng");
-        const name = place.getAttribute("name");
-        const uid = place.getAttribute("uid");
-        const bikes = place.getAttribute("bikes");
-
-        L.marker([lat, lon]).addTo(map)
-          .bindPopup(`<b>${name}</b><br>Station: ${uid}<br>Verfügbare Räder: ${bikes}`);
-      }
+  fetch('stations.geojson')
+    .then(response => response.json())
+    .then(data => {
+      L.geoJSON(data, {
+        onEachFeature: function (feature, layer) {
+          const props = feature.properties;
+          layer.bindPopup(`<b>${props.name}</b><br>Station: ${props.uid}<br>Räder verfügbar: ${props.bikes}`);
+        }
+      }).addTo(map);
     });
 </script>
 </body>
