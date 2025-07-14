@@ -55,8 +55,8 @@
 
     #locateMe {
       position: absolute;
-      bottom: 20px;
-      right: 10px;
+      bottom: 10px;
+      right: 20px;
       z-index: 1000;
       background: #fff;
       border: none;
@@ -66,35 +66,34 @@
       cursor: pointer;
       font-family: sans-serif;
     }
+
+    /* Geocoder-Button sichtbar & mobilfreundlich */
     .leaflet-control-geocoder {
-  max-width: 250px;
-  width: auto;
-  z-index: 1001;
-  font-size: 14px;
-  background: white;
-  padding: 4px;
-  border-radius: 6px;
-  box-shadow: 0 0 5px rgba(0,0,0,0.2);
-}
+      z-index: 1100 !important;
+      background: white;
+      padding: 4px;
+      border-radius: 6px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    }
 
-.leaflet-control-geocoder-icon {
-  width: 32px !important;
-  height: 32px !important;
-  background-size: 70% 70% !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-  background-color: white !important;
-  border-radius: 4px;
-  box-shadow: 0 0 3px rgba(0,0,0,0.3);
-  opacity: 1 !important;
-}
+    .leaflet-control-geocoder-icon {
+      width: 34px !important;
+      height: 34px !important;
+      background-size: 70% 70% !important;
+      background-position: center !important;
+      background-repeat: no-repeat !important;
+      background-color: white !important;
+      border-radius: 4px;
+      box-shadow: 0 0 3px rgba(0,0,0,0.3);
+      opacity: 1 !important;
+    }
 
-@media (max-width: 600px) {
-  .leaflet-control-geocoder {
-    max-width: 90%;
-    margin-bottom: 60px;
-  }
-}
+    @media (max-width: 600px) {
+      .leaflet-control-geocoder {
+        margin-top: 60px;
+        max-width: 90%;
+      }
+    }
   </style>
 </head>
 <body>
@@ -118,105 +117,14 @@
 <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
 
 <script>
-  const map = L.map('map').setView([52.264, 10.526], 13); // Braunschweig
+  const map = L.map('map').setView([52.264, 10.526], 13);
 
   // Basiskarte
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap-Mitwirkende'
   }).addTo(map);
 
-  // Geocoder
-  L.Control.geocoder({
-  position: 'bottomleft'
-}).addTo(map);
-
-  
-  const bikeIcon = L.icon({
-    iconUrl: 'bike-icon.png',
-    iconSize: [40, 40],
-    iconAnchor: [20, 40],
-    popupAnchor: [0, -40]
-  });
-
-  // Layer-Gruppen
-  const markers = L.markerClusterGroup();
-  const plainMarkers = L.layerGroup();
-  let clusteringEnabled = false;
-
-  // Daten laden
-  fetch('./stations.geojson')
-    .then(response => response.json())
-    .then(data => {
-  const geoJsonLayer = L.geoJSON(data, {
-    pointToLayer: function (feature, latlng) {
-      return L.marker(latlng, { icon: bikeIcon });
-    },
-    onEachFeature: function (feature, layer) {
-      const props = feature.properties;
-      const name = props["place_name"] || 'Unbekannt';
-      const number = props["station_number"] || '–';
-
-      const popupContent = `<b>${name}</b><br>Stationsnummer: ${number}`;
-      layer.bindPopup(popupContent);
-
-      // Popup bei Mouseover anzeigen
-      layer.on('mouseover', function () {
-        this.openPopup();
-      });
-      layer.on('mouseout', function () {
-        this.closePopup();
-      });
-    } // ← fehlte!
-  });
-
-  // Beide Layer vorbereiten
-  markers.addLayer(geoJsonLayer);
-  plainMarkers.addLayer(geoJsonLayer);
-
-  // Standardmäßig: KEIN Clustering
-  map.addLayer(plainMarkers);
-});
-
-  // Cluster-Button
-  document.getElementById("toggleCluster").addEventListener("click", () => {
-    if (clusteringEnabled) {
-      map.removeLayer(markers);
-      map.addLayer(plainMarkers);
-      document.getElementById("toggleCluster").innerText = "Cluster einblenden";
-    } else {
-      map.removeLayer(plainMarkers);
-      map.addLayer(markers);
-      document.getElementById("toggleCluster").innerText = "Cluster ausblenden";
-    }
-    clusteringEnabled = !clusteringEnabled;
-  });
-
-  // Standort-Button
-  document.getElementById("locateMe").addEventListener("click", () => {
-    if (!navigator.geolocation) {
-      alert("Geolokalisierung wird von deinem Browser nicht unterstützt.");
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-
-        map.setView([lat, lng], 15);
-
-        L.circleMarker([lat, lng], {
-          radius: 8,
-          color: '#007aff',
-          fillColor: '#007aff',
-          fillOpacity: 0.8
-        }).addTo(map).bindPopup("Du bist hier").openPopup();
-      },
-      () => {
-        alert("Standort konnte nicht ermittelt werden.");
-      }
-    );
-  });
-</script>
-</body>
-</html>
+  // Geocoder sichtbar platzieren
+  const geocoder = L.Control.geocoder({
+    position: 'topleft',
+    defaultMarkGeocode:
