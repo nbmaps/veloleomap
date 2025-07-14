@@ -8,10 +8,29 @@
   <style>
     body { margin: 0; }
     #map { height: 100vh; width: 100vw; }
+    #logo-link {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+  background: white;
+  padding: 5px;
+  border-radius: 8px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.2);
+}
+
+#velo-logo {
+  height: 50px;
+  width: auto;
+}
   </style>
 </head>
 <body>
 <div id="map"></div>
+  <a id="logo-link" href="https://www.nextbike.de/veloleo/de/" target="_blank" rel="noopener">
+  <img id="velo-logo" src="https://www.nextbike.de/veloleo/wp-content/uploads/sites/39/2025/01/Logo-2.svg" alt="Veloleo Logo" />
+</a>
+  
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
