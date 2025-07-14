@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Veloleo – Braunschweig</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body { margin: 0; }
+    #map { height: 100vh; width: 100vw; }
+  </style>
+</head>
+<body>
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+  const map = L.map('map').setView([52.264, 10.526], 13); // Braunschweig
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap-Mitwirkende'
+  }).addTo(map);
+
+  fetch('https://api.nextbike.net/api/getStations.xml?city=braunschweig')
+    .then(response => response.text())
+    .then(xmlStr => {
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(xmlStr, "application/xml");
+      const places = xml.getElementsByTagName("place");
+
+      for (let place of places) {
+        const lat = place.getAttribute("lat");
+        const lon = place.getAttribute("lng");
+        const name = place.getAttribute("name");
+        const uid = place.getAttribute("uid");
+        const bikes = place.getAttribute("bikes");
+
+        L.marker([lat, lon]).addTo(map)
+          .bindPopup(`<b>${name}</b><br>Station: ${uid}<br>Verfügbare Räder: ${bikes}`);
+      }
+    });
+</script>
+</body>
+</html>
