@@ -84,50 +84,48 @@
     const plainMarkers = L.layerGroup();
     let clusteringEnabled = false;
 
-    fetch("https://gbfs.nextbike.net/maps/gbfs/v2/nextbike_dn/gbfs.json")
-      .then(res => res.json())
-      .then(data => {
-        const feeds = Object.fromEntries(data.data.de.feeds.map(f => [f.name, f.url]));
-        return Promise.all([
-          fetch(feeds.station_information).then(res => res.json()),
-          fetch(feeds.station_status).then(res => res.json())
-        ]);
-      })
-      .then(([info, status]) => {
-        const infoMap = Object.fromEntries(info.data.stations.map(s => [s.station_id, s]));
-        const features = status.data.stations.map(s => {
-          const i = infoMap[s.station_id];
-          if (!i) return null;
-          return {
-            type: 'Feature',
-            geometry: { type: 'Point', coordinates: [i.lon, i.lat] },
-            properties: {
-              name: i.name,
-              bikes: s.num_bikes_available,
-              docks: s.num_docks_available
-            }
-          };
-        }).filter(Boolean);
+    const stationInfoUrl = "https://gbfs.nextbike.net/maps/gbfs/v2/nextbike_dn/de/station_information.json";
+    const stationStatusUrl = "https://gbfs.nextbike.net/maps/gbfs/v2/nextbike_dn/de/station_status.json";
 
-        const layer = L.geoJSON(features, {
-          pointToLayer: (feature, latlng) => L.marker(latlng, { icon: bikeIcon }),
-          onEachFeature: (feature, layer) => {
-            const p = feature.properties;
-            const popup = `<b>${p.name}</b><br>Räder: ${p.bikes} / ${p.docks}`;
-            layer.bindPopup(popup);
-            layer.on('mouseover', () => layer.openPopup());
-            layer.on('mouseout', () => layer.closePopup());
+    Promise.all([
+      fetch(stationInfoUrl).then(res => res.json()),
+      fetch(stationStatusUrl).then(res => res.json())
+    ])
+    .then(([info, status]) => {
+      const infoMap = Object.fromEntries(info.data.stations.map(s => [s.station_id, s]));
+      const features = status.data.stations.map(s => {
+        const i = infoMap[s.station_id];
+        if (!i) return null;
+        return {
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: [i.lon, i.lat] },
+          properties: {
+            name: i.name,
+            bikes: s.num_bikes_available,
+            docks: s.num_docks_available
           }
-        });
+        };
+      }).filter(Boolean);
 
-        markers.addLayer(layer);
-        plainMarkers.addLayer(layer);
-        map.addLayer(plainMarkers);
-      })
-      .catch(err => {
-        console.error('Fehler beim Laden der Stationsdaten', err);
-        alert('Stationsdaten konnten nicht geladen werden.');
+      const layer = L.geoJSON(features, {
+        pointToLayer: (feature, latlng) => L.marker(latlng, { icon: bikeIcon }),
+        onEachFeature: (feature, layer) => {
+          const p = feature.properties;
+          const popup = `<b>${p.name}</b><br>Räder: ${p.bikes} / ${p.docks}`;
+          layer.bindPopup(popup);
+          layer.on('mouseover', () => layer.openPopup());
+          layer.on('mouseout', () => layer.closePopup());
+        }
       });
+
+      markers.addLayer(layer);
+      plainMarkers.addLayer(layer);
+      map.addLayer(plainMarkers);
+    })
+    .catch(err => {
+      console.error('Fehler beim Laden der Stationsdaten', err);
+      alert('Stationsdaten konnten nicht geladen werden.');
+    });
 
     document.getElementById('toggleCluster').onclick = function () {
       if (clusteringEnabled) {
