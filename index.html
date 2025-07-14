@@ -5,7 +5,7 @@
   <title>Veloleo – Braunschweig (CORS-Bypass)</title>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="bike-icon_perhaps.png"/>
+  <link rel="icon" type="image/png" href="bike-icon.png"/>
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"/>
@@ -74,8 +74,8 @@
     }).addTo(map);
     L.Control.geocoder({position: 'bottomleft'}).addTo(map);
 
-                const gbfsIcon = L.icon({
-      iconUrl: 'bike-icon_perhaps.png',
+    const bikeIcon = L.icon({
+      iconUrl: 'bike-icon.png',
       iconSize: [40, 40],
       iconAnchor: [20, 40],
       popupAnchor: [0, -40]
@@ -104,7 +104,6 @@
           properties: {
             name: i.name,
             station_id: i.short_name,
-            station_id: i.station_id,
             bikes: s.num_bikes_available,
             docks: s.num_docks_available
           }
@@ -112,7 +111,7 @@
       }).filter(Boolean);
 
       const layer = L.geoJSON(features, {
-        pointToLayer: (feature, latlng) => L.marker(latlng, { icon: gbfsIcon }),
+        pointToLayer: (feature, latlng) => L.marker(latlng, { icon: bikeIcon }),
         onEachFeature: (feature, layer) => {
           const p = feature.properties;
           const popup = `<b>${p.name}</b><br>Stationsnummer: ${p.station_id}<br>Räder: ${p.bikes}`;
@@ -130,28 +129,6 @@
       console.error('Fehler beim Laden der Stationsdaten', err);
       alert('Stationsdaten konnten nicht geladen werden.');
     });
-  // Zusätzlicher Layer für geplante Stationen
-  fetch('./bscoming.geojson')
-    .then(response => response.json())
-    .then(data => {
-      const futureLayer = L.geoJSON(data, {
-        pointToLayer: function (feature, latlng) {
-          return L.marker(latlng, { icon: comingIcon });
-        },
-        onEachFeature: function (feature, layer) {
-          const props = feature.properties;
-          const name = props["place_name"] || "Unbekannt";
-          const status = props["status"] || "–";
-          const popup = `<b>${name}</b><br>Status: ${status}`;
-          layer.bindPopup(popup);
-          layer.on('mouseover', () => layer.openPopup());
-          layer.on('mouseout', () => layer.closePopup());
-        }
-      });
-      futureLayer.addTo(map);
-    })
-    .catch(err => console.error('Fehler beim Laden von bscoming.geojson', err));
-
 
     document.getElementById('toggleCluster').onclick = function () {
       if (clusteringEnabled) {
