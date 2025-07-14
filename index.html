@@ -4,45 +4,68 @@
   <title>Veloleo – Braunschweig (statisch)</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <!-- Geocoder CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+
+  <!-- MarkerCluster CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+
   <style>
     body { margin: 0; }
     #map { height: 100vh; width: 100vw; }
-    #logo-link {
-  position: absolute;
-  top: 10px;
-  left: 60px;
-  z-index: 1000;
-  background: white;
-  padding: 5px;
-  border-radius: 8px;
-  box-shadow: 0 0 5px rgba(0,0,0,0.2);
-}
 
-#velo-logo {
-  height: 50px;
-  width: auto;
-}
+    #logo-link {
+      position: absolute;
+      top: 10px;
+      left: 60px;
+      z-index: 1000;
+      background: white;
+      padding: 5px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    }
+
+    #velo-logo {
+      height: 50px;
+      width: auto;
+    }
+
     #logo-link:hover {
-  opacity: 0.5;
-}
-    
+      opacity: 0.5;
+    }
   </style>
 </head>
 <body>
+
 <div id="map"></div>
-  <a id="logo-link" href="https://www.nextbike.de/veloleo/de/" target="_blank" rel="noopener">
+
+<a id="logo-link" href="https://www.nextbike.de/veloleo/de/" target="_blank" rel="noopener">
   <img id="velo-logo" src="https://www.nextbike.de/veloleo/wp-content/uploads/sites/39/2025/01/Logo-2.svg" alt="Veloleo Logo" />
 </a>
-  
 
+<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<!-- Geocoder JS -->
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+<!-- MarkerCluster JS -->
+<script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+
 <script>
   const map = L.map('map').setView([52.264, 10.526], 13); // Braunschweig
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap-Mitwirkende'
   }).addTo(map);
+
+  // Geocoder hinzufügen
+  L.Control.geocoder().addTo(map);
 
   const bikeIcon = L.icon({
     iconUrl: 'bike-icon.png',
@@ -51,10 +74,13 @@
     popupAnchor: [0, -40]
   });
 
+  // Marker-Cluster-Gruppe vorbereiten
+  const markers = L.markerClusterGroup();
+
   fetch('./stations.geojson')
     .then(response => response.json())
     .then(data => {
-      L.geoJSON(data, {
+      const geoJsonLayer = L.geoJSON(data, {
         pointToLayer: function (feature, latlng) {
           return L.marker(latlng, { icon: bikeIcon });
         },
@@ -62,10 +88,12 @@
           const props = feature.properties;
           const name = props["place_name"] || 'Unbekannt';
           const number = props["station_number"] || '–';
-
           layer.bindPopup(`<b>${name}</b><br>Stationsnummer: ${number}`);
         }
-      }).addTo(map);
+      });
+
+      markers.addLayer(geoJsonLayer);
+      map.addLayer(markers);
     });
 </script>
 </body>
