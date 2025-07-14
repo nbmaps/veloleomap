@@ -115,35 +115,35 @@
   fetch('./stations.geojson')
     .then(response => response.json())
     .then(data => {
-      const geoJsonLayer = L.geoJSON(data, {
-        pointToLayer: function (feature, latlng) {
-          return L.marker(latlng, { icon: bikeIcon });
-        },
-        onEachFeature: function (feature, layer) {
-  const props = feature.properties;
-  const name = props["place_name"] || 'Unbekannt';
-  const number = props["station_number"] || '–';
+  const geoJsonLayer = L.geoJSON(data, {
+    pointToLayer: function (feature, latlng) {
+      return L.marker(latlng, { icon: bikeIcon });
+    },
+    onEachFeature: function (feature, layer) {
+      const props = feature.properties;
+      const name = props["place_name"] || 'Unbekannt';
+      const number = props["station_number"] || '–';
 
-  const popupContent = `<b>${name}</b><br>Stationsnummer: ${number>`;
-  layer.bindPopup(popupContent);
+      const popupContent = `<b>${name}</b><br>Stationsnummer: ${number}`;
+      layer.bindPopup(popupContent);
 
-  // Popup bei Mouseover anzeigen
-  layer.on('mouseover', function () {
-    this.openPopup();
+      // Popup bei Mouseover anzeigen
+      layer.on('mouseover', function () {
+        this.openPopup();
+      });
+      layer.on('mouseout', function () {
+        this.closePopup();
+      });
+    } // ← fehlte!
   });
-  layer.on('mouseout', function () {
-    this.closePopup();
-  });
-  }
-  }
 
-      // Beide Layer vorbereiten
-      markers.addLayer(geoJsonLayer);
-      plainMarkers.addLayer(geoJsonLayer);
+  // Beide Layer vorbereiten
+  markers.addLayer(geoJsonLayer);
+  plainMarkers.addLayer(geoJsonLayer);
 
-      // Standardmäßig: KEIN Clustering
-      map.addLayer(plainMarkers);
-    });
+  // Standardmäßig: KEIN Clustering
+  map.addLayer(plainMarkers);
+});
 
   // Cluster-Button
   document.getElementById("toggleCluster").addEventListener("click", () => {
