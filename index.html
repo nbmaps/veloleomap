@@ -97,8 +97,11 @@
   }).addTo(map);
 
   // Geocoder
-  L.Control.geocoder().addTo(map);
+  L.Control.geocoder({
+  position: 'bottomleft'
+}).addTo(map);
 
+  
   const bikeIcon = L.icon({
     iconUrl: 'bike-icon.png',
     iconSize: [40, 40],
