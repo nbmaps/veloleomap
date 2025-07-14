@@ -120,18 +120,22 @@
           return L.marker(latlng, { icon: bikeIcon });
         },
         onEachFeature: function (feature, layer) {
-          const props = feature.properties;
-          const name = props["place_name"] || 'Unbekannt';
-          const number = props["station_number"] || '–';
-          const popupContent = `<b>${name}</b><br>Stationsnummer: ${number>`;
-layer.bindPopup(popupContent);
+  const props = feature.properties;
+  const name = props["place_name"] || 'Unbekannt';
+  const number = props["station_number"] || '–';
 
-layer.on('mouseover', function () {
-  this.openPopup();
-});
-layer.on('mouseout', function () {
-  this.closePopup();
-});
+  const popupContent = `<b>${name}</b><br>Stationsnummer: ${number>`;
+  layer.bindPopup(popupContent);
+
+  // Popup bei Mouseover anzeigen
+  layer.on('mouseover', function () {
+    this.openPopup();
+  });
+  layer.on('mouseout', function () {
+    this.closePopup();
+  });
+}
+
         }
       });
 
