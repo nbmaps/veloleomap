@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -103,6 +104,7 @@
           properties: {
             name: i.name,
             station_id: i.short_name,
+            station_id: i.station_id,
             bikes: s.num_bikes_available,
             docks: s.num_docks_available
           }
@@ -113,7 +115,7 @@
         pointToLayer: (feature, latlng) => L.marker(latlng, { icon: bikeIcon }),
         onEachFeature: (feature, layer) => {
           const p = feature.properties;
-          const popup = <b>${p.name}</b><br>Stationsnummer: ${p.station_id}<br>Räder: ${p.bikes};
+          const popup = `<b>${p.name}</b><br>Stationsnummer: ${p.station_id}<br>Räder: ${p.bikes}`;
           layer.bindPopup(popup);
           layer.on('mouseover', () => layer.openPopup());
           layer.on('mouseout', () => layer.closePopup());
