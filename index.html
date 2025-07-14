@@ -4,9 +4,7 @@
   <title>Veloleo – Braunschweig (Live)</title>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="bike-icon.png">
 
-  <!-- Leaflet + Geocoder + MarkerCluster CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css"/>
@@ -15,159 +13,93 @@
   <style>
     body { margin:0; }
     #map { height:100vh; width:100vw; }
-
-    #logo-link {
-      position: absolute;
-      top: 10px;
-      left: 60px;
-      z-index: 1000;
-      background: white;
-      padding: 5px;
-      border-radius: 8px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.2);
-    }
-
-    #velo-logo {
-      height: 50px;
-      width: auto;
-    }
-
-    #toggleCluster {
-      position: absolute;
-      bottom: 60px;
-      right: 10px;
-      z-index: 1000;
-      background: #fff;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
-      box-shadow: 0 0 4px rgba(0,0,0,0.3);
-      cursor: pointer;
-      font-family: sans-serif;
-    }
-
-    #locateMe {
-      position: absolute;
-      bottom: 20px;
-      right: 10px;
-      z-index: 1000;
-      background: #fff;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
-      box-shadow: 0 0 4px rgba(0,0,0,0.3);
-      cursor: pointer;
-      font-family: sans-serif;
-    }
-
-    @media (max-width: 600px) {
-      .leaflet-control-geocoder {
-        margin-top: 60px;
-        max-width: 90%;
-      }
-    }
+    #logo-link { position:absolute; top:10px; left:60px; z-index:1000; background:white; padding:5px; border-radius:8px; box-shadow:0 0 5px rgba(0,0,0,0.2);}
+    #velo-logo { height:50px; width:auto;}
+    #toggleCluster { position:absolute; bottom:60px; right:10px; z-index:1000; background:#fff; border:none; padding:8px 12px; border-radius:6px; box-shadow:0 0 4px rgba(0,0,0,0.3); cursor:pointer;}
+    #locateMe { position:absolute; bottom:20px; right:10px; z-index:1000; background:#fff; border:none; padding:8px 12px; border-radius:6px; box-shadow:0 0 4px rgba(0,0,0,0.3); cursor:pointer;}
+    .leaflet-control-geocoder { z-index:1100!important; background:white; padding:4px; border-radius:6px; box-shadow:0 0 5px rgba(0,0,0,0.2);}
+    .leaflet-control-geocoder-icon { width:34px!important; height:34px!important; background-size:70% 70%!important; background-position:center!important; background-repeat:no-repeat!important; background-color:white!important; border-radius:4px; box-shadow:0 0 3px rgba(0,0,0,0.3); opacity:1!important;}
+    @media (max-width:600px){ .leaflet-control-geocoder{margin-top:60px;max-width:90%;} }
   </style>
 </head>
 <body>
-<div id="map"></div>
+  <div id="map"></div>
+  <a id="logo-link" href="https://www.nextbike.de/veloleo/de/" target="_blank" rel="noopener">
+    <img id="velo-logo" src="https://www.nextbike.de/veloleo/wp-content/uploads/sites/39/2025/01/Logo-2.svg" alt="Veloleo Logo"/>
+  </a>
+  <button id="toggleCluster">Cluster einblenden</button>
+  <button id="locateMe">📍 Mein Standort</button>
 
-<a id="logo-link" href="https://www.nextbike.de/veloleo/de/" target="_blank" rel="noopener">
-  <img id="velo-logo" src="https://www.nextbike.de/veloleo/wp-content/uploads/sites/39/2025/01/Logo-2.svg" alt="Veloleo Logo" />
-</a>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
 
-<button id="toggleCluster">Cluster einblenden</button>
-<button id="locateMe">📍 Mein Standort</button>
+  <script>
+    const map = L.map('map').setView([52.264, 10.526], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      { attribution: '© OpenStreetMap-Mitwirkende' }).addTo(map);
+    L.Control.geocoder({position:'bottomleft'}).addTo(map);
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+    const bikeIcon = L.icon({iconUrl:'bike-icon.png',iconSize:[40,40],iconAnchor:[20,40],popupAnchor:[0,-40]});
+    const markers = L.markerClusterGroup(), plainMarkers = L.layerGroup();
+    let clusteringEnabled = false;
 
-<script>
-  const map = L.map('map').setView([52.264, 10.526], 13);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap-Mitwirkende'
-  }).addTo(map);
+    const DISCOVERY = "https://gbfs.nextbike.net/maps/gbfs/v2/nextbike_bs/gbfs.json";
 
-  L.Control.geocoder({position:'bottomleft'}).addTo(map);
+    fetch(DISCOVERY)
+      .then(r=>r.json())
+      .then(d=>{
+        const feeds = Object.fromEntries(d.data.en.feeds.map(f=>[f.name,f.url]));
+        return Promise.all([
+          fetch(feeds.station_information).then(r=>r.json()),
+          fetch(feeds.station_status).then(r=>r.json())
+        ]);
+      })
+      .then(([info, status])=>{
+        const infoMap = Object.fromEntries(info.data.stations.map(s=>[s.station_id,s]));
+        const features = status.data.stations
+          .map(s=> {
+            const i=infoMap[s.station_id];
+            if(!i)return null;
+            return {
+              type:'Feature',
+              geometry:{type:'Point',coordinates:[i.lon,i.lat]},
+              properties:{name:i.name,bikes:s.num_bikes_available,docks:s.num_docks_available}
+            };
+          })
+          .filter(Boolean);
 
-  const bikeIcon = L.icon({
-    iconUrl: 'bike-icon.png',
-    iconSize: [40, 40],
-    iconAnchor: [20, 40],
-    popupAnchor: [0, -40]
-  });
-
-  const markers = L.markerClusterGroup();
-  const plainMarkers = L.layerGroup();
-  let clusteringEnabled = false;
-
-  fetch('https://api.nextbike.net/maps/gbfs/v1/nextbike_bs/gbfs.json')
-    .then(r => r.json())
-    .then(d => {
-      const feeds = d.data.en.feeds.reduce((acc, f) => (acc[f.name]=f.url,acc),{});
-      return Promise.all([
-        fetch(feeds.station_information).then(r=>r.json()),
-        fetch(feeds.station_status).then(r=>r.json())
-      ]);
-    })
-    .then(([infoData, statusData]) => {
-      const infoMap = Object.fromEntries(infoData.data.stations.map(s => [s.station_id,s]));
-      const features = statusData.data.stations.map(st => {
-        const info = infoMap[st.station_id];
-        if (!info) return null;
-        return {
-          type:'Feature',
-          geometry:{type:'Point',coordinates:[info.lon,info.lat]},
-          properties:{
-            id:st.station_id,
-            name:info.name,
-            bikes:st.num_bikes_available,
-            docks:st.num_docks_available
+        const layer = L.geoJSON(features, {
+          pointToLayer:(f,latlng)=>L.marker(latlng,{icon:bikeIcon}),
+          onEachFeature:(f,ly)=> {
+            const p=f.properties;
+            ly.bindPopup(`<b>${p.name}</b><br>Räder: ${p.bikes} / ${p.docks}`);
+            ly.on('mouseover',()=>ly.openPopup());
+            ly.on('mouseout',()=>ly.closePopup());
           }
-        };
-      }).filter(Boolean);
+        });
 
-      const layer = L.geoJSON(features, {
-        pointToLayer:(f,latlng)=>L.marker(latlng,{icon:bikeIcon}),
-        onEachFeature:(f,lyr)=>{
-          const p = f.properties;
-          lyr.bindPopup(`<b>${p.name}</b><br>Räder verfügbar: ${p.bikes}<br>Freie Plätze: ${p.docks}`);
-          lyr.on('mouseover', () => lyr.openPopup());
-          lyr.on('mouseout', () => lyr.closePopup());
-        }
-      });
+        markers.addLayer(layer);
+        plainMarkers.addLayer(layer);
+        map.addLayer(plainMarkers);
+      })
+      .catch(e=>{console.error("GBFS Error",e);alert("Stationsdaten konnten nicht geladen werden.");});
 
-      markers.addLayer(layer);
-      plainMarkers.addLayer(layer);
-      map.addLayer(plainMarkers);
-    }).catch(e => {
-      console.error("GBFS-Fehler:", e);
-      alert("Fehler beim Laden der Stationsdaten.");
-    });
+    document.getElementById("toggleCluster").onclick = () => {
+      if(clusteringEnabled){ map.removeLayer(markers); map.addLayer(plainMarkers); this.innerText="Cluster einblenden";}
+      else{ map.removeLayer(plainMarkers); map.addLayer(markers); this.innerText="Cluster ausblenden";}
+      clusteringEnabled = !clusteringEnabled;
+    };
 
-  document.getElementById("toggleCluster").onclick = () => {
-    if (clusteringEnabled) {
-      map.removeLayer(markers);
-      map.addLayer(plainMarkers);
-      document.getElementById("toggleCluster").innerText = "Cluster einblenden";
-    } else {
-      map.removeLayer(plainMarkers);
-      map.addLayer(markers);
-      document.getElementById("toggleCluster").innerText = "Cluster ausblenden";
-    }
-    clusteringEnabled = !clusteringEnabled;
-  };
-
-  document.getElementById("locateMe").onclick = () => {
-    if (!navigator.geolocation) return alert('Geolocation nicht unterstützt.');
-    navigator.geolocation.getCurrentPosition(pos => {
-      const lat = pos.coords.latitude, lng = pos.coords.longitude;
-      map.setView([lat, lng], 15);
-      L.circleMarker([lat, lng], {
-        radius: 8, color: '#007aff', fillColor: '#007aff', fillOpacity: 0.8
-      }).addTo(map).bindPopup("Du bist hier").openPopup();
-    }, () => alert('Standort konnte nicht ermittelt werden.'));
-  };
-</script>
+    document.getElementById("locateMe").onclick = ()=> {
+      if(!navigator.geolocation)return alert("Geolocation nicht unterstützt.");
+      navigator.geolocation.getCurrentPosition(p=>{
+        const lat=p.coords.latitude,lng=p.coords.longitude;
+        map.setView([lat,lng],15);
+        L.circleMarker([lat,lng],{radius:8,color:'#007aff',fillColor:'#007aff',fillOpacity:0.8})
+         .addTo(map).bindPopup("Du bist hier").openPopup();
+      },()=>alert("Standort konnte nicht ermittelt werden."));
+    };
+  </script>
 </body>
 </html>
