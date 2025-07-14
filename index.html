@@ -33,4 +33,17 @@
     .then(data => {
       L.geoJSON(data, {
         pointToLayer: function (feature, latlng) {
-          return L.marke
+          return L.marker(latlng, { icon: bikeIcon });
+        },
+        onEachFeature: function (feature, layer) {
+          const props = feature.properties;
+          const name = props["place_name"] || 'Unbekannt';
+          const number = props["station_number"] || '–';
+
+          layer.bindPopup(`<b>${name}</b><br>Stationsnummer: ${number}`);
+        }
+      }).addTo(map);
+    });
+</script>
+</body>
+</html>
