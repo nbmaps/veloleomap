@@ -66,6 +66,19 @@
       cursor: pointer;
       font-family: sans-serif;
     }
+    .leaflet-control-geocoder {
+  max-width: 250px;
+  width: auto;
+  z-index: 1001;
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .leaflet-control-geocoder {
+    max-width: 90%;
+    margin-bottom: 60px; /* Platz über den Buttons */
+  }
+}
   </style>
 </head>
 <body>
