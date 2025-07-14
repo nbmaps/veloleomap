@@ -74,7 +74,7 @@
     }).addTo(map);
     L.Control.geocoder({position: 'bottomleft'}).addTo(map);
 
-    const bikeIcon = L.icon({
+        const bikeIcon = L.icon({
       iconUrl: 'bike-icon_perhaps.png',
       iconSize: [40, 40],
       iconAnchor: [20, 40],
@@ -136,7 +136,7 @@
     .then(data => {
       const futureLayer = L.geoJSON(data, {
         pointToLayer: function (feature, latlng) {
-          return L.marker(latlng, { icon: bikeIcon });
+          return L.marker(latlng, { icon: futureIcon });
         },
         onEachFeature: function (feature, layer) {
           const props = feature.properties;
