@@ -124,9 +124,9 @@
   const markers = L.markerClusterGroup();
   const plainMarkers = L.layerGroup();
   let clusteringEnabled = false;
-
-  const stationInfoURL = "https://braunschweig.prod.nextbike.net/maps/gbfs/v2/bs/en/station_information.json";
-  const stationStatusURL = "https://braunschweig.prod.nextbike.net/maps/gbfs/v2/bs/en/station_status.json";
+  const GBFS_BASE = "https://api.nextbike.net/maps/gbfs/v1/nextbike_bs";
+  const stationInfoURL = `${GBFS_BASE}/station_information.json`;
+  const stationStatusURL = `${GBFS_BASE}/station_status.json`;
 
   Promise.all([
     fetch(stationInfoURL).then(res => res.json()),
