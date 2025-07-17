@@ -72,7 +72,7 @@
 </head>
 <body>
   <div id="map"></div>
-<button id="toggleFreeBikes">Freie Räder einblenden</button>
+<button id="toggleFreeBikes">Räder ⏻</button>
   <a id="logo-link" href="https://www.nextbike.de/veloleo/de/" target="_blank" rel="noopener">
     <img id="velo-logo" src="logodomain.png" alt="Veloleo Logo"/>
   </a>
@@ -141,10 +141,10 @@
     document.getElementById('toggleFreeBikes').onclick = function () {
       if (freeBikeVisible) {
         map.removeLayer(freeBikeLayer);
-        this.innerText = 'Freie Räder einblenden';
+        this.innerText = 'Räder ⏻';
       } else {
         map.addLayer(freeBikeLayer);
-        this.innerText = 'Freie Räder ausblenden';
+        this.innerText = 'Räder ⏼';
       }
       freeBikeVisible = !freeBikeVisible;
     };
@@ -283,10 +283,10 @@
     document.getElementById('toggleFreeBikes').onclick = function () {
       if (freeBikeVisible) {
         map.removeLayer(freeBikeLayer);
-        this.innerText = 'Freie Räder einblenden';
+        this.innerText = 'Räder ⏻';
       } else {
         map.addLayer(freeBikeLayer);
-        this.innerText = 'Freie Räder ausblenden';
+        this.innerText = 'Räder ⏼';
       }
       freeBikeVisible = !freeBikeVisible;
     };
@@ -449,10 +449,10 @@
     document.getElementById('toggleFreeBikes').onclick = function () {
       if (freeBikeVisible) {
         map.removeLayer(freeBikeLayer);
-        this.innerText = 'Freie Räder einblenden';
+        this.innerText = 'Räder ⏻';
       } else {
         map.addLayer(freeBikeLayer);
-        this.innerText = 'Freie Räder ausblenden';
+        this.innerText = 'Räder ⏼';
       }
       freeBikeVisible = !freeBikeVisible;
     };
