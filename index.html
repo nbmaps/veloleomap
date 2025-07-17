@@ -56,7 +56,7 @@
   
 #toggleFreeBikes {
   position: absolute;
-  bottom: 80px;
+  bottom: 100px;
   right: 10px;
   z-index: 1000;
   background: #fff;
@@ -212,10 +212,10 @@
     document.getElementById('toggleFreeBikes').onclick = function () {
       if (freeBikeVisible) {
         map.removeLayer(freeBikeLayer);
-        this.innerText = 'Freie Räder einblenden';
+        this.innerText = 'Räder ⏻';
       } else {
         map.addLayer(freeBikeLayer);
-        this.innerText = 'Freie Räder ausblenden';
+        this.innerText = 'Räder ⏼';
       }
       freeBikeVisible = !freeBikeVisible;
     };
@@ -417,9 +417,9 @@
 
     const freeBikeIcon = L.icon({
       iconUrl: 'bicon.png',
-      iconSize: [30, 30],
-      iconAnchor: [15, 30],
-      popupAnchor: [0, -30]
+      iconSize: [15, 15],
+      iconAnchor: [7, 15],
+      popupAnchor: [0, -15]
     });
 
     let freeBikeLayer = L.layerGroup();
