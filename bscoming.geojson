@@ -22,7 +22,7 @@
 { "type": "Feature", "properties": { "place_name": "P+R Rote Wiese", "status": "potenzieller Standort", "lat": "52,23991896", "lng": "10,53830485" }, "geometry": { "type": "Point", "coordinates": [ 10.53830485, 52.23991896 ] } },
 { "type": "Feature", "properties": { "place_name": "Tostmannplatz (Schuntersiedlung)", "status": "potenzieller Standort", "lat": "52,29624505", "lng": "10,53998684" }, "geometry": { "type": "Point", "coordinates": [ 10.53998684, 52.29624505 ] } },
 { "type": "Feature", "properties": { "place_name": "Theaterwall", "status": "potenzieller Standort", "lat": "52,26953954", "lng": "10,53013035" }, "geometry": { "type": "Point", "coordinates": [ 10.53013035, 52.26953954 ] } },
-{ "type": "Feature", "properties": { "place_name": "P&R Gänsekamp", "status": "potenzieller Standort", "lat": "52,26879079", "lng": "10,56626858" }, "geometry": { "type": "Point", "coordinates": [ 10.56626858, 52.26879079 ] } }
-{ "type": "Feature", "properties": { "place_name": "Städtisches Klinikum Braunschweig", "status": "potenzieller Standort", "lat": "52.236764142170294", "lng": "10.54467547302203" }, "geometry": { "type": "Point", "coordinates": [ 10.54467547302203, 52.236764142170294 ] } }
+{ "type": "Feature", "properties": { "place_name": "P&R Gänsekamp", "status": "potenzieller Standort", "lat": "52,26879079", "lng": "10,56626858" }, "geometry": { "type": "Point", "coordinates": [ 10.56626858, 52.26879079 ] } },
+{ "type": "Feature", "properties": { "place_name": "Städtisches Klinikum Braunschweig", "status": "potenzieller Standort", "lat": "52,236764142170294", "lng": "10,54467547302203" }, "geometry": { "type": "Point", "coordinates": [ 10.54467547302203, 52.236764142170294 ] } }
 ]
 }
